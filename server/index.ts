@@ -37,6 +37,9 @@ const run = async () => {
 	await world.downloadWorld()
 	await world.uploadWorld()
 
+	setTimeout(() => world.uploadWorld(), 30000)
+	setInterval(() => world.uploadWorld(), 5 * 60 * 1000)
+
 	const mcs = spawn("/start")
 
 	mcs.stdout.on('data', (data) => console.log(data.toString()));
