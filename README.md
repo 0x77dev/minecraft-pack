@@ -1,4 +1,5 @@
 # Minecraft Pack
+[![Server Docker Publish](https://github.com/0x77dev/minecraft-pack/actions/workflows/docker-publish.yml/badge.svg?branch=master)](https://github.com/0x77dev/minecraft-pack/actions/workflows/docker-publish.yml)
 
 **!!AHTUNG, offensive language!!**
 
