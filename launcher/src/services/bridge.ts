@@ -3,20 +3,21 @@ import { Server, createServer } from "net"
 import getPort from "get-port"
 
 export class Bridge {
-  private ws = new WebSocket("wss://minecraft-pack.herokuapp.com")
   private server: Server
 
   public async start(): Promise<number> {
     this.server = createServer((socket) => {
-      this.ws.on("open", () => {
-        socket.on("data", (data) => this.ws.send(data))
-        this.ws.on("message", (data) => socket.write(data as Buffer))
-        socket.on("close", () => this.ws.close())
+      const ws = new WebSocket("wss://minecraft-pack.herokuapp.com")
+
+      ws.on("open", () => {
+        socket.on("data", (data) => ws.send(data))
+        ws.on("message", (data) => socket.write(data as Buffer))
+        socket.on("close", () => ws.close())
       })
 
-      this.ws.on("error", (err) => {
+      ws.on("error", (err) => {
         console.error(err)
-        this.ws.close()
+        ws.close()
         socket.destroy()
         process.exit(-228)
       })
