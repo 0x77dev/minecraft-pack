@@ -1,0 +1,8 @@
+# Minecraft Pack
+
+**!!AHTUNG, offensive language!!**
+
+My personal minecraft server pack, built on top of [itzg/minecraft-server](https://github.com/itzg/docker-minecraft-server), with WebSocket proxy and custom launcher.
+
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
