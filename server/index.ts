@@ -4,24 +4,16 @@ import WebSocket from "ws"
 import Express from "express"
 import morgan from "morgan"
 import { spawn } from "child_process"
+import { World } from "./services/world"
 
 const app = Express()
 app.use(morgan("combined"))
 
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server })
+const world = new World()
 
 app.get("/", (_, res) => res.send())
-
-const mcs = spawn("/start")
-
-mcs.stdout.on('data', (data) => console.log(data.toString()));
-
-mcs.stderr.on('data', (data) => console.error(data.toString()));
-
-wss.on("listening", () => {
-	console.info("ready to accept connections")
-})
 
 wss.on('connection', (ws, req) => {
 	console.log("new connection", req.headers)
@@ -37,5 +29,20 @@ wss.on('connection', (ws, req) => {
 	ws.on("message", (data) => minecraft.write(data as Buffer))
 });
 
-server.listen(process.env.PORT ? parseInt(process.env.PORT) : 1337)
+wss.on("listening", () => {
+	console.info("ready to accept connections")
+})
 
+const run = async () => {
+	await world.downloadWorld()
+
+	const mcs = spawn("/start")
+
+	mcs.stdout.on('data', (data) => console.log(data.toString()));
+	mcs.stderr.on('data', (data) => console.error(data.toString()));
+}
+
+run()
+	.catch(console.error)
+
+server.listen(process.env.PORT ? parseInt(process.env.PORT) : 1337)
