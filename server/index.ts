@@ -35,6 +35,7 @@ wss.on("listening", () => {
 
 const run = async () => {
 	await world.downloadWorld()
+	await world.uploadWorld()
 
 	const mcs = spawn("/start")
 
