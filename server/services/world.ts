@@ -16,7 +16,7 @@ export class World extends EventEmitter {
 
   public async downloadWorld() {
     const [files] = await this.bucket.getFiles({
-      prefix: 'world'
+      prefix: 'data'
     })
 
     console.log("downloading", files)
@@ -32,10 +32,10 @@ export class World extends EventEmitter {
 
   public async uploadWorld() {
     try {
-      const files = readdirSync(join('/data', 'world'))
+      const files = readdirSync('/data')
 
       for (const file of files) {
-        await this.bucket.upload(file, { destination: join('world', file) })
+        await this.bucket.upload(file, { destination: `data/${file}` })
       }
     } catch (error) {
       console.warn(error)
