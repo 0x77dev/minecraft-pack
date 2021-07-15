@@ -31,10 +31,14 @@ export class World extends EventEmitter {
   }
 
   public async uploadWorld() {
-    const files = readdirSync(join('/data', 'world'))
+    try {
+      const files = readdirSync(join('/data', 'world'))
 
-    for (const file of files) {
-      await this.bucket.upload(file, { destination: join('world', file) })
+      for (const file of files) {
+        await this.bucket.upload(file, { destination: join('world', file) })
+      }
+    } catch (error) {
+      console.warn(error)
     }
   }
 }
