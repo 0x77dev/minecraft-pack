@@ -1,44 +1,37 @@
-import { EventEmitter } from "events";
-import { Bucket, Storage } from "@google-cloud/storage"
-import { join } from "path"
-import { readdirSync } from 'fs'
-export class World extends EventEmitter {
-  private bucket: Bucket
+import { exec } from "child_process"
+import { writeFileSync } from "fs"
 
-  constructor(
-    private storage = new Storage({
-      credentials: JSON.parse(Buffer.from(process.env.GOOGLE_KEY as string, "base64").toString())
+export const authorizeStorage = () => {
+  return new Promise((res, rej) => {
+    writeFileSync('/tmp/key.json', Buffer.from(process.env.GOOGLE_KEY as string, "base64"))
+    exec("gcloud auth activate-service-account server@minecraft-pack.iam.gserviceaccount.com --key-file=/tmp/key.json --project=minecraft-pack", (err, stdout) => {
+      if (err) { rej(err); return }
+      console.log(stdout)
+      res(stdout)
     })
-  ) {
-    super()
-    this.bucket = this.storage.bucket(process.env.GCS_BUCKET_NAME as string)
-  }
+  })
+}
 
-  public async downloadWorld() {
-    const [files] = await this.bucket.getFiles({
-      prefix: 'data'
+export const upload = () => {
+  const bucketName = process.env.GCS_BUCKET_NAME as string
+
+  return new Promise((res, rej) => {
+    exec(`gsutil -m cp -r /data/world "gs://${bucketName}"`, (err, stdout) => {
+      if (err) { rej(err); return }
+      console.log(stdout)
+      res(stdout)
     })
+  })
+}
 
-    console.log("downloading", files)
+export const download = () => {
+  const bucketName = process.env.GCS_BUCKET_NAME as string
 
-    for (const file of files) {
-      await file.download({
-        destination: join('/data', file.name)
-      })
-
-      console.log(file.name)
-    }
-  }
-
-  public async uploadWorld() {
-    try {
-      const files = readdirSync('/data')
-
-      for (const file of files) {
-        await this.bucket.upload(file, { destination: `data/${file}` })
-      }
-    } catch (error) {
-      console.warn(error)
-    }
-  }
+  return new Promise((res, rej) => {
+    exec(`gsutil -m cp -r "gs://${bucketName}" /data/world`, (err, stdout) => {
+      if (err) { rej(err); return }
+      console.log(stdout)
+      res(stdout)
+    })
+  })
 }

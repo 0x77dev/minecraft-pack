@@ -4,14 +4,12 @@ import WebSocket from "ws"
 import Express from "express"
 import morgan from "morgan"
 import { spawn } from "child_process"
-import { World } from "./services/world"
-
+import { authorizeStorage, download, upload } from "./services/world"
 const app = Express()
 app.use(morgan("combined"))
 
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server })
-const world = new World()
 
 app.get("/", (_, res) => res.send())
 
@@ -34,11 +32,11 @@ wss.on("listening", () => {
 })
 
 const run = async () => {
-	await world.downloadWorld()
-	await world.uploadWorld()
+	await authorizeStorage()
+	await download()
+	await upload()
 
-	setTimeout(() => world.uploadWorld(), 30000)
-	setInterval(() => world.uploadWorld(), 5 * 60 * 1000)
+	setInterval(() => upload(), 5 * 60000)
 
 	const mcs = spawn("/start")
 
